@@ -67,6 +67,8 @@ export function AdminCalendarSources({ members }: AdminCalendarSourcesProps) {
   const [applyingSourceId, setApplyingSourceId] = useState<string | null>(null);
   const [isPreviewing, setIsPreviewing] = useState<string | null>(null);
   const [isSyncingNow, setIsSyncingNow] = useState<string | null>(null);
+  const [savingScheduleSourceId, setSavingScheduleSourceId] = useState<string | null>(null);
+  const [scheduleSaveMessage, setScheduleSaveMessage] = useState<Record<string, string>>({});
   const [previewModalSourceId, setPreviewModalSourceId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -153,38 +155,46 @@ export function AdminCalendarSources({ members }: AdminCalendarSourcesProps) {
     setPreviewModalSourceId((current) => (current === sourceId ? null : current));
   }
 
-  function updateSourceSchedule(sourceId: string, updates: Partial<Pick<CalendarSource, "syncMode" | "schedule">>) {
-    let nextSource: CalendarSource | undefined;
+  async function updateSourceSchedule(
+    source: CalendarSource,
+    updates: Partial<Pick<CalendarSource, "syncMode" | "schedule">>,
+  ) {
+    const syncMode = updates.syncMode ?? source.syncMode;
+    const nextSource = {
+      ...source,
+      schedule:
+        syncMode === "scheduled"
+          ? {
+              lastAttemptedOn:
+                updates.schedule?.lastAttemptedOn ?? source.schedule?.lastAttemptedOn,
+              time: updates.schedule?.time ?? source.schedule?.time ?? "05:00",
+            }
+          : undefined,
+      syncMode,
+    };
 
     setSources((current) =>
-      current.map((source) => {
-        if (source.id !== sourceId) {
-          return source;
-        }
-
-        const syncMode = updates.syncMode ?? source.syncMode;
-        const schedule =
-          syncMode === "scheduled"
-            ? {
-                lastAttemptedOn:
-                  updates.schedule?.lastAttemptedOn ??
-                  source.schedule?.lastAttemptedOn,
-                time: updates.schedule?.time ?? source.schedule?.time ?? "05:00",
-              }
-            : undefined;
-
-        nextSource = {
-          ...source,
-          schedule,
-          syncMode,
-        };
-
-        return nextSource;
-      }),
+      current.map((candidate) => (candidate.id === source.id ? nextSource : candidate)),
     );
+    setSavingScheduleSourceId(source.id);
+    setScheduleSaveMessage((current) => ({ ...current, [source.id]: "Saving refresh settings…" }));
 
-    if (nextSource) {
-      void saveCalendarSource(nextSource);
+    try {
+      await saveSource(nextSource);
+      setScheduleSaveMessage((current) => ({
+        ...current,
+        [source.id]:
+          syncMode === "scheduled"
+            ? `Daily refresh saved for ${nextSource.schedule?.time ?? "05:00"}.`
+            : "Automatic refresh turned off.",
+      }));
+    } catch (error) {
+      setScheduleSaveMessage((current) => ({
+        ...current,
+        [source.id]: getErrorMessage(error, "Could not save refresh settings."),
+      }));
+    } finally {
+      setSavingScheduleSourceId(null);
     }
   }
 
@@ -291,7 +301,7 @@ export function AdminCalendarSources({ members }: AdminCalendarSourcesProps) {
     }
   }
 
-  async function previewSource(source: CalendarSource) {
+  async function previewSource(source: CalendarSource, persistPreview = true) {
     if (!source.url) {
       return;
     }
@@ -339,14 +349,12 @@ export function AdminCalendarSources({ members }: AdminCalendarSourcesProps) {
         lastSyncStatus: "success" as const,
         lastSyncMessage,
       };
-      setSources((current) =>
-        current.map((candidate) =>
-          candidate.id === source.id
-            ? syncedSource
-            : candidate,
-        ),
-      );
-      void saveCalendarSource(syncedSource);
+      if (persistPreview) {
+        setSources((current) =>
+          current.map((candidate) => (candidate.id === source.id ? syncedSource : candidate)),
+        );
+        void saveCalendarSource(syncedSource);
+      }
 
       return {
         preview: data as CalendarPreviewResult,
@@ -383,7 +391,7 @@ export function AdminCalendarSources({ members }: AdminCalendarSourcesProps) {
     setIsSyncingNow(source.id);
 
     try {
-      const result = await previewSource(source);
+      const result = await previewSource(source, false);
 
       if (result) {
         await applyPreview(result.source, result.preview);
@@ -586,7 +594,7 @@ export function AdminCalendarSources({ members }: AdminCalendarSourcesProps) {
                         <select
                           className="border border-[#d7e0e7] bg-white px-3 py-2"
                           onChange={(event) =>
-                            updateSourceSchedule(source.id, {
+                            void updateSourceSchedule(source, {
                               syncMode: event.target.value as CalendarSource["syncMode"],
                             })
                           }
@@ -602,7 +610,7 @@ export function AdminCalendarSources({ members }: AdminCalendarSourcesProps) {
                           className="border border-[#d7e0e7] bg-white px-3 py-2 disabled:opacity-50"
                           disabled={source.syncMode !== "scheduled"}
                           onChange={(event) =>
-                            updateSourceSchedule(source.id, {
+                            void updateSourceSchedule(source, {
                               schedule: {
                                 lastAttemptedOn: source.schedule?.lastAttemptedOn,
                                 time: event.target.value,
@@ -616,6 +624,11 @@ export function AdminCalendarSources({ members }: AdminCalendarSourcesProps) {
                       </label>
                     </div>
                     <p className="mt-2 text-sm text-[#4c5965]">{getScheduleSummary(source, timeZone)}</p>
+                    {scheduleSaveMessage[source.id] ? (
+                      <p className="mt-1 text-sm font-medium text-[#2f6f73]" role="status">
+                        {scheduleSaveMessage[source.id]}
+                      </p>
+                    ) : null}
                     <fieldset className="mt-3 grid gap-2 text-sm">
                       <legend className="font-semibold text-[#17202a]">Show on dashboards for</legend>
                       <div className="flex flex-wrap gap-2">
@@ -646,11 +659,20 @@ export function AdminCalendarSources({ members }: AdminCalendarSourcesProps) {
                       }}
                       type="button"
                     >
-                      {isPreviewing === source.id ? "Previewing..." : "Preview"}
+                      {isPreviewing === source.id
+                        ? "Previewing..."
+                        : previewBySource[source.id]
+                          ? "Review & apply"
+                          : "Preview"}
                     </button>
                     <button
                       className="border border-[#1f6f8b] bg-[#1f6f8b] px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
-                      disabled={isPreviewing === source.id || applyingSourceId === source.id || isSyncingNow === source.id}
+                      disabled={
+                        isPreviewing === source.id ||
+                        applyingSourceId === source.id ||
+                        isSyncingNow === source.id ||
+                        savingScheduleSourceId === source.id
+                      }
                       onClick={() => void syncSourceNow(source)}
                       type="button"
                     >
@@ -710,10 +732,10 @@ function getPreviewMessage(preview: CalendarPreviewResult) {
   const eventLabel = preview.eventCount === 1 ? "event" : "events";
 
   if (preview.eventCount > shownCount) {
-    return `Found ${preview.eventCount} ${eventLabel}. Showing first ${shownCount}; Apply will import all ${preview.eventCount}.`;
+    return `Found ${preview.eventCount} ${eventLabel}. Showing first ${shownCount}; select Preview to review and apply them, or Sync now to fetch and apply all ${preview.eventCount}.`;
   }
 
-  return `Found ${preview.eventCount} ${eventLabel}. Apply will import ${preview.eventCount}.`;
+  return `Found ${preview.eventCount} ${eventLabel}. Select Preview to review and apply them, or Sync now to fetch and apply them.`;
 }
 
 function getScheduleSummary(source: CalendarSource, timeZone: string) {
