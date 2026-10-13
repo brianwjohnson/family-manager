@@ -1,4 +1,4 @@
-import plannerJson from "../../../data/summer-2026-planner.json";
+import plannerJson from "../../../data/family-planner.json";
 import type {
   DayOfWeek,
   DayTemplate,

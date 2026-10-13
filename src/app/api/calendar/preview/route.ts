@@ -2,10 +2,9 @@ import {
   compactIcsCalendarForImport,
   fetchCalendarText,
   getAllowedCalendarFetchUrl,
-  getCalendarImportStartsOn,
+  getCalendarImportWindow,
   looksLikeIcsCalendar,
 } from "@/lib/calendar/preview";
-import { plannerData } from "@/lib/planner/schedule";
 
 type PreviewRequest = {
   sourceId?: string;
@@ -28,7 +27,7 @@ export async function POST(request: Request) {
   }
 
   const sourceId = body.sourceId?.trim() || "calendar-preview";
-  const timeZone = body.timeZone?.trim() || plannerData.timezone;
+  const timeZone = body.timeZone?.trim() || "America/Chicago";
   const url = body.url?.trim();
   const fetchUrl = await getAllowedCalendarFetchUrl(url);
 
@@ -63,10 +62,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const startsOn = getCalendarImportStartsOn(plannerData.season.startsOn);
+  const { startsOn, endsOn } = getCalendarImportWindow();
   const calendarImportText = compactIcsCalendarForImport(calendarText, {
     startsOn,
-    endsOn: plannerData.season.endsOn,
+    endsOn,
   });
   let events;
 
@@ -75,7 +74,7 @@ export async function POST(request: Request) {
     events = parseIcsEvents(calendarImportText, {
       sourceId,
       startsOn,
-      endsOn: plannerData.season.endsOn,
+      endsOn,
       timeZone,
       maxExpandedEvents: previewExpansionLimit,
     });

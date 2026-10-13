@@ -6,11 +6,20 @@ type AddressResolver = (hostname: string) => Promise<string[]>;
 const maxCalendarBytes = 5 * 1024 * 1024;
 const maxRedirects = 2;
 
-export function getCalendarImportStartsOn(seasonStartsOn: string) {
-  const [year, month] = seasonStartsOn.split("-").map(Number);
-  const startsOn = new Date(year, month - 2, 1);
+/**
+ * Shared calendar sources need a useful recent-history window as well as the
+ * coming year. This keeps imports independent of any seeded planning period.
+ */
+export function getCalendarImportWindow(now = new Date()) {
+  const recentStart = new Date(now);
+  recentStart.setDate(recentStart.getDate() - 31);
+  const nextYear = new Date(now);
+  nextYear.setFullYear(nextYear.getFullYear() + 1);
 
-  return `${startsOn.getFullYear()}-${String(startsOn.getMonth() + 1).padStart(2, "0")}-01`;
+  return {
+    startsOn: formatDateKey(recentStart),
+    endsOn: formatDateKey(nextYear),
+  };
 }
 
 export function compactIcsCalendarForImport(
@@ -281,4 +290,12 @@ function isBlockedIpAddress(address: string) {
 
 function isIPv4MappedAddress(address: string) {
   return address.toLowerCase().startsWith("::ffff:");
+}
+
+function formatDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }

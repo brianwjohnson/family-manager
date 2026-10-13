@@ -1,45 +1,21 @@
 # Schedule Data Model
 
-`data/summer-2026-planner.json` is now prototype configuration data for the household console. The UI can change freely, but this file should remain easy to transform into dashboard state, calendar events, and future Supabase rows.
+`data/family-planner.json` contains lightweight household seed data for the console. The UI can change freely, but this file should remain easy to transform into dashboard state and future Supabase rows.
 
 The dashboard must not treat this file as the source of truth for the current date. Today is computed from the real date in the household timezone. If today does not exist inside this prototype data, the app should show the real date with empty events and a missing-baseline state.
 
 ## Current Assumptions
 
-- Summer starts on `2026-06-02`.
-- Labor Day is `2026-09-07`.
-- School resumes after Labor Day, currently modeled as `2026-09-08`.
-- Kids are awake around `07:30` and bedtime is `20:00`.
-- Weekday work-from-home protection matters most from `08:00-16:00`.
-- Draft blocks inside quiet house hours should bias toward daily reading, workbook time, crafts, puzzles, independent projects, outside activity, lunch/reset, and rest.
-- School-year weekday and weekend baselines are not modeled yet.
-- Personal and sports calendar data is configured through `/admin` and stored browser-locally until Supabase persistence exists.
+- Personal and sports calendar data is configured through `/admin` and stored in the household calendar feed.
+- Connected feeds import the previous 31 days and the following year, so current sports seasons are not tied to seed data dates.
+- Routine templates are configured through the admin experience rather than generated from a fixed seasonal plan.
 
 ## Calendar Setup Path
 
-1. Keep baseline schedule blocks as `draft` calendar items.
-2. Use `/admin` to add Apple/shared family, SportsEngine, school, and other ICS or `webcal://` sources.
-3. Preview each source and apply it to the local dashboard feed.
-4. Run `pnpm plan:summer-workdays` during development to regenerate the summer weekday coverage plan.
-5. Resolve conflicts by date and time, preferring applied fixed events over generated draft-like blocks.
-6. Use the applied and generated events as today-dashboard context.
-7. Promote calendar sources and applied events into Supabase so setup syncs across devices.
-
-The old `pnpm import:calendar`, `pnpm import:sports`, and `pnpm refresh:family-calendar` scripts remain development utilities. Do not commit personal calendar exports or imported personal calendar events into seed data.
-
-## Generated Summer Workday Plan
-
-`pnpm plan:summer-workdays` regenerates fixed events from the `summer-workday-plan` source. The script removes prior generated events and rebuilds them from the current planner data, so it is safe to rerun after calendar imports.
-
-The generated plan applies to Monday-Friday dates inside the summer season and assigns events to all child profiles:
-
-- `08:00-09:00`: Quiet me time: reading or pickup.
-- `09:00-11:00`: Away activity: biking, soccer, park, or outing.
-- `11:30-12:00`: Lunch.
-- `12:00-14:00`: At-home outside time.
-- `15:30-16:00`: Toy pickup and house reset.
-
-Substantive child activities such as VBS, camp, school, lessons, practices, games, appointments, doctor, dentist, soccer, tennis, gymnastics, and hockey should suppress overlapping generated blocks once they are applied from calendar feeds. Reminder-like events such as paying, ordering, calling, packing, registering, signing up, or bringing snacks should not suppress the plan by themselves.
+1. Use `/admin` to add Apple/shared family, Crossbar, school, and other ICS or `webcal://` sources.
+2. Preview each source and apply it to the dashboard feed.
+3. Resolve conflicts by date and time, preferring applied calendar events over optional routine templates.
+4. Promote calendar sources and applied events into Supabase so setup syncs across devices.
 
 ## Likely Supabase Tables
 
@@ -58,7 +34,7 @@ The broader household console will also need durable records for households, rou
 
 ## Chores
 
-Chores now live under `chores` in `data/summer-2026-planner.json`.
+Chores live under `chores` in `data/family-planner.json`.
 
 - `routineChores` are daily checklists, currently the kids' weekday morning routine.
 - `weeklyChores` are the reusable chore bank and can optionally carry an `allowanceAmount`.
