@@ -98,7 +98,7 @@ Sensitive identity data should stay local. If face recognition is added later, r
 
 - Rewrite the README around the household console direction.
 - Document local-first, Mac Mini, Supabase, and deferred face recognition decisions.
-- Preserve the summer planner prototype as configuration data.
+- Keep only lightweight household seed data; calendar events come from connected sources.
 - Keep local env files and secrets out of git.
 - Create a private GitHub remote and push the cleaned baseline.
 

@@ -6,7 +6,7 @@ Family Manager is an iPad-first household console. The goal is a shared kitchen 
 - What is different about today?
 - What does the house need from me?
 
-The current app keeps the summer 2026 planner, chores, and calendar importer as prototype planning data while the product pivots toward a personalized daily dashboard.
+The app uses household routines, chores, and connected calendar sources to power a personalized daily dashboard.
 
 ## Current Direction
 
@@ -20,7 +20,7 @@ The current app keeps the summer 2026 planner, chores, and calendar importer as 
 ## Current Prototype
 
 - Next.js app shell with TypeScript and Tailwind.
-- Household members, summer schedule blocks, generated summer workday events, routine chores, weekly chores, chore payouts, and allowance ledger seeds in `data/summer-2026-planner.json`.
+- Household members, routine chores, weekly chores, chore payouts, and allowance ledger seeds in `data/family-planner.json`.
 - A manual profile dashboard that filters routines, events, and chores by selected family member.
 - Real-date Today Engine with explicit missing states when no baseline is configured for the current day.
 - Browser-local checklist completion tracking, chore allowance ledger tracking, plus editable routine steps, recurring responsibilities, and same-day task/reminder quick-add.
@@ -35,7 +35,7 @@ The current app keeps the summer 2026 planner, chores, and calendar importer as 
 
 The app has the Supabase household schema in place, but the main dashboard still renders from browser-local state until the UI is moved onto normalized tables.
 
-- Prototype configuration data lives in `data/summer-2026-planner.json`.
+- Prototype configuration data lives in `data/family-planner.json`.
 - User actions, saved calendar sources, applied calendar events, chore edits, and assignment overrides currently render from browser `localStorage`.
 - Personal calendar data should be added through `/admin` on the deployed app, not committed into seed data.
 - Supabase access is scoped by `household_users`, so each account only sees households it belongs to.
@@ -113,16 +113,6 @@ Saved calendar sources can refresh automatically without a Mac Mini when all of 
 - `/api/cron/calendar-sync` is being called on a schedule
 
 This repo includes [vercel.json](/Users/brianjohnson/Documents/Development/family-manager/vercel.json) to call that route once daily on production, which fits Vercel Hobby cron limits. The route checks which scheduled sources are due and only refreshes each source once per local household day.
-
-## Local Calendar Import Script
-
-`scripts/import-ics-to-planner.mjs` remains available as a development utility, but personal calendars should not be committed into `data/summer-2026-planner.json`.
-
-For generated baseline planning, run:
-
-```bash
-pnpm plan:summer-workdays
-```
 
 ## GitHub Remote Setup
 

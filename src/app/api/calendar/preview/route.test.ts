@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
-import { compactIcsCalendarForImport, getAllowedCalendarFetchUrl } from "@/lib/calendar/preview";
+import {
+  compactIcsCalendarForImport,
+  getAllowedCalendarFetchUrl,
+  getCalendarImportWindow,
+} from "@/lib/calendar/preview";
 import { POST } from "./route";
 
 const originalFetch = globalThis.fetch;
@@ -10,6 +14,15 @@ afterEach(() => {
 });
 
 describe("Calendar preview route", () => {
+  it("keeps recent events and the coming year in the import window", () => {
+    const window = getCalendarImportWindow(new Date("2026-10-13T15:00:00Z"));
+
+    assert.deepEqual(window, {
+      startsOn: "2026-09-12",
+      endsOn: "2027-10-13",
+    });
+  });
+
   it("returns 400 for malformed JSON", async () => {
     const response = await POST(
       new Request("http://localhost/api/calendar/preview", {
@@ -82,6 +95,8 @@ describe("Calendar preview route", () => {
   });
 
   it("previews a public calendar URL", async () => {
+    const eventDate = getTestDate();
+
     globalThis.fetch = async () =>
       new Response(
         [
@@ -89,8 +104,8 @@ describe("Calendar preview route", () => {
           "VERSION:2.0",
           "BEGIN:VEVENT",
           "UID:test-event",
-          "DTSTART:20260603T140000Z",
-          "DTEND:20260603T150000Z",
+          `DTSTART:${eventDate.icalDate}T140000`,
+          `DTEND:${eventDate.icalDate}T150000`,
           "SUMMARY:Soccer practice",
           "END:VEVENT",
           "END:VCALENDAR",
@@ -111,12 +126,14 @@ describe("Calendar preview route", () => {
     assert.equal(response.status, 200);
     assert.equal(body.eventCount, 1);
     assert.equal(body.events[0].title, "Soccer practice");
-    assert.equal(body.events[0].date, "2026-06-03");
-    assert.equal(body.events[0].startTime, "09:00");
-    assert.equal(body.events[0].endTime, "10:00");
+    assert.equal(body.events[0].date, eventDate.dateKey);
+    assert.equal(body.events[0].startTime, "14:00");
+    assert.equal(body.events[0].endTime, "15:00");
   });
 
   it("previews a SportsEngine-style calendar URL", async () => {
+    const eventDate = getTestDate();
+
     globalThis.fetch = async () =>
       new Response(
         [
@@ -129,8 +146,8 @@ describe("Calendar preview route", () => {
           "UID:08f63bb3-b957-4f3c-a2ad-155a342cf891@sportsengine.com",
           "SEQUENCE:1747251567",
           "DTSTAMP:20250514T193927Z",
-          "DTSTART;TZID=America/Chicago:20260603T184500",
-          "DTEND;TZID=America/Chicago:20260603T194500",
+          `DTSTART;TZID=America/Chicago:${eventDate.icalDate}T184500`,
+          `DTEND;TZID=America/Chicago:${eventDate.icalDate}T194500`,
           "SUMMARY:FURY U8@Orono",
           "LOCATION:ORONO",
           "DESCRIPTION:https://sportsengine.app.link/?al=sportsengine%3A%2F%2Fevent%2",
@@ -160,15 +177,15 @@ describe("Calendar preview route", () => {
     assert.equal(body.events[0].endTime, "19:45");
   });
 
-  it("returns every event in the planner window instead of only the first preview rows", async () => {
+  it("returns every event in the calendar window instead of only the first preview rows", async () => {
     const eventBlocks = Array.from({ length: 21 }, (_, index) => {
-      const day = String(index + 1).padStart(2, "0");
+      const eventDate = getTestDate(index);
 
       return [
         "BEGIN:VEVENT",
         `UID:test-event-${index}`,
-        `DTSTART:202607${day}T140000Z`,
-        `DTEND:202607${day}T150000Z`,
+        `DTSTART:${eventDate.icalDate}T140000`,
+        `DTEND:${eventDate.icalDate}T150000`,
         `SUMMARY:Soccer practice ${index + 1}`,
         "END:VEVENT",
       ].join("\r\n");
@@ -229,17 +246,19 @@ describe("Calendar preview route", () => {
     assert.match(compacted, /Recurring appointment/);
   });
 
-  it("includes the month before the configured season starts", async () => {
+  it("includes a recent calendar event", async () => {
+    const eventDate = getTestDate(-30);
+
     globalThis.fetch = async () =>
       new Response(
         [
           "BEGIN:VCALENDAR",
           "VERSION:2.0",
           "BEGIN:VEVENT",
-          "UID:may-event",
-          "DTSTART:20260528T140000Z",
-          "DTEND:20260528T150000Z",
-          "SUMMARY:May soccer practice",
+          "UID:recent-event",
+          `DTSTART:${eventDate.icalDate}T140000`,
+          `DTEND:${eventDate.icalDate}T150000`,
+          "SUMMARY:Recent soccer practice",
           "END:VEVENT",
           "END:VCALENDAR",
         ].join("\r\n"),
@@ -258,7 +277,7 @@ describe("Calendar preview route", () => {
 
     assert.equal(response.status, 200);
     assert.equal(body.eventCount, 1);
-    assert.equal(body.events[0].date, "2026-05-28");
+    assert.equal(body.events[0].date, eventDate.dateKey);
   });
 
   it("returns JSON when a calendar cannot be parsed", async () => {
@@ -279,3 +298,16 @@ describe("Calendar preview route", () => {
     assert.equal(typeof body.error, "string");
   });
 });
+
+function getTestDate(offsetDays = 0) {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return {
+    dateKey: `${year}-${month}-${day}`,
+    icalDate: `${year}${month}${day}`,
+  };
+}

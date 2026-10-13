@@ -1,0 +1,485 @@
+{
+  "version": 1,
+  "timezone": "America/Chicago",
+  "season": {
+    "id": "family-calendar",
+    "label": "Family calendar",
+    "startsOn": "2026-01-01",
+    "endsOn": "2027-12-31",
+    "schoolReturnsOn": "",
+    "notes": []
+  },
+  "household": {
+    "members": [
+      {
+        "id": "brian",
+        "preferredName": "Brian",
+        "displayName": "Me",
+        "role": "parent",
+        "relationship": "dad",
+        "birthDate": "1985-06-10"
+      },
+      {
+        "id": "angela",
+        "preferredName": "Angela",
+        "displayName": "Mom",
+        "role": "parent",
+        "relationship": "mom",
+        "birthDate": "1986-04-24",
+        "workFromHome": true,
+        "focusWindows": [
+          {
+            "startTime": "09:00",
+            "endTime": "12:00"
+          },
+          {
+            "startTime": "13:00",
+            "endTime": "16:30"
+          }
+        ]
+      },
+      {
+        "id": "mason",
+        "preferredName": "Mason",
+        "displayName": "Mason",
+        "role": "child",
+        "relationship": "son",
+        "birthDate": "2017-06-01"
+      },
+      {
+        "id": "reagan",
+        "preferredName": "Reagan",
+        "displayName": "Reagan",
+        "role": "child",
+        "relationship": "daughter",
+        "birthDate": "2018-09-04"
+      },
+      {
+        "id": "kenzley",
+        "preferredName": "Kenzley",
+        "displayName": "Kenzley",
+        "role": "child",
+        "relationship": "daughter",
+        "birthDate": "2020-05-28"
+      }
+    ]
+  },
+  "calendarSources": [],
+  "dayTemplates": [],
+  "fixedEvents": [],
+  "futureModules": [
+    {
+      "id": "chores",
+      "label": "Chores",
+      "status": "active"
+    },
+    {
+      "id": "daily-routines",
+      "label": "Daily routines",
+      "status": "active"
+    },
+    {
+      "id": "allowance",
+      "label": "Allowance",
+      "status": "active"
+    }
+  ],
+  "chores": {
+    "weeklyTargetPerChild": 5,
+    "routineChores": [
+      {
+        "id": "make-bed",
+        "title": "Make bed",
+        "category": "house-reset",
+        "defaultAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ],
+        "schedule": {
+          "daysOfWeek": [
+            "MO",
+            "TU",
+            "WE",
+            "TH",
+            "FR"
+          ],
+          "startTime": "08:30",
+          "endTime": "08:40"
+        },
+        "countsTowardWeeklyTarget": false
+      },
+      {
+        "id": "brush-teeth",
+        "title": "Brush teeth",
+        "category": "personal-hygiene",
+        "defaultAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ],
+        "schedule": {
+          "daysOfWeek": [
+            "MO",
+            "TU",
+            "WE",
+            "TH",
+            "FR"
+          ],
+          "startTime": "08:40",
+          "endTime": "08:45"
+        },
+        "countsTowardWeeklyTarget": false
+      },
+      {
+        "id": "dirty-clothes-hamper",
+        "title": "Put dirty clothes in hamper",
+        "category": "laundry",
+        "defaultAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ],
+        "schedule": {
+          "daysOfWeek": [
+            "MO",
+            "TU",
+            "WE",
+            "TH",
+            "FR"
+          ],
+          "startTime": "08:45",
+          "endTime": "08:50"
+        },
+        "countsTowardWeeklyTarget": false
+      },
+      {
+        "id": "clear-breakfast-dishes",
+        "title": "Clear breakfast dishes",
+        "category": "kitchen",
+        "defaultAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ],
+        "schedule": {
+          "daysOfWeek": [
+            "MO",
+            "TU",
+            "WE",
+            "TH",
+            "FR"
+          ],
+          "startTime": "08:50",
+          "endTime": "09:00"
+        },
+        "countsTowardWeeklyTarget": false
+      }
+    ],
+    "weeklyChores": [
+      {
+        "id": "empty-dishwasher",
+        "title": "Empty dishwasher",
+        "category": "kitchen",
+        "estimatedMinutes": 10,
+        "allowanceAmount": 0.5,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan"
+        ]
+      },
+      {
+        "id": "walk-dog",
+        "title": "Walk the dog",
+        "category": "pets",
+        "estimatedMinutes": 15,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan"
+        ],
+        "requiresAdultCheck": true
+      },
+      {
+        "id": "feed-dog",
+        "title": "Feed the dog",
+        "category": "pets",
+        "estimatedMinutes": 5,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ]
+      },
+      {
+        "id": "set-table",
+        "title": "Set the table",
+        "category": "kitchen",
+        "estimatedMinutes": 5,
+        "eligibleAssigneeIds": [
+          "reagan",
+          "kenzley"
+        ]
+      },
+      {
+        "id": "clear-table",
+        "title": "Clear the table",
+        "category": "kitchen",
+        "estimatedMinutes": 8,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ]
+      },
+      {
+        "id": "living-room-reset",
+        "title": "Living room reset",
+        "category": "house-reset",
+        "estimatedMinutes": 10,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ]
+      },
+      {
+        "id": "toy-reset",
+        "title": "Toy reset",
+        "category": "house-reset",
+        "estimatedMinutes": 10,
+        "eligibleAssigneeIds": [
+          "kenzley",
+          "reagan"
+        ]
+      },
+      {
+        "id": "trash-small-cans",
+        "title": "Empty small trash cans",
+        "category": "house-reset",
+        "estimatedMinutes": 10,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan"
+        ]
+      },
+      {
+        "id": "organize-bedroom",
+        "title": "Organize bedroom",
+        "category": "house-reset",
+        "estimatedMinutes": 10,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ],
+        "definitionOfDone": "Toys, books, and clothes are back in their places and the floor is clear."
+      },
+      {
+        "id": "put-away-laundry",
+        "title": "Put away clean laundry",
+        "category": "laundry",
+        "estimatedMinutes": 10,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ],
+        "definitionOfDone": "Clean clothes are folded or hung and put into the right drawers or closets."
+      },
+      {
+        "id": "sweep-floors",
+        "title": "Sweep kitchen or playroom floor",
+        "category": "house-reset",
+        "estimatedMinutes": 10,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan"
+        ],
+        "definitionOfDone": "Visible crumbs and dirt are swept up and the dustpan is emptied."
+      },
+      {
+        "id": "dust-furniture",
+        "title": "Dust furniture and baseboards",
+        "category": "house-reset",
+        "estimatedMinutes": 10,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ],
+        "definitionOfDone": "Dust the reachable surfaces and leave the cloth in the laundry."
+      },
+      {
+        "id": "wipe-counters",
+        "title": "Wipe kitchen counters",
+        "category": "kitchen",
+        "estimatedMinutes": 5,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan"
+        ],
+        "definitionOfDone": "Counters are wiped clean after meals or snack prep."
+      },
+      {
+        "id": "put-away-groceries",
+        "title": "Put away groceries",
+        "category": "kitchen",
+        "estimatedMinutes": 10,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan",
+          "kenzley"
+        ],
+        "definitionOfDone": "Pantry and fridge items are put into the correct places."
+      },
+      {
+        "id": "water-flowers",
+        "title": "Water plants or flowers",
+        "category": "yard",
+        "estimatedMinutes": 10,
+        "eligibleAssigneeIds": [
+          "mason",
+          "reagan"
+        ],
+        "definitionOfDone": "Outdoor pots or beds are watered evenly without flooding them."
+      },
+      {
+        "id": "start-laundry",
+        "title": "Start a load of laundry",
+        "category": "laundry",
+        "estimatedMinutes": 10,
+        "eligibleAssigneeIds": [
+          "mason"
+        ],
+        "requiresAdultCheck": true,
+        "definitionOfDone": "Clothes are sorted, detergent is measured with help, and the washer is started."
+      }
+    ],
+    "weeklyAssignmentTemplates": [
+      {
+        "id": "mason-dishwasher-mon",
+        "childId": "mason",
+        "choreId": "empty-dishwasher",
+        "dayOfWeek": "MO",
+        "startTime": "16:00",
+        "endTime": "16:15"
+      },
+      {
+        "id": "mason-dog-tue",
+        "childId": "mason",
+        "choreId": "walk-dog",
+        "dayOfWeek": "TU",
+        "startTime": "16:00",
+        "endTime": "16:20"
+      },
+      {
+        "id": "mason-dishwasher-wed",
+        "childId": "mason",
+        "choreId": "empty-dishwasher",
+        "dayOfWeek": "WE",
+        "startTime": "16:00",
+        "endTime": "16:15"
+      },
+      {
+        "id": "mason-trash-thu",
+        "childId": "mason",
+        "choreId": "trash-small-cans",
+        "dayOfWeek": "TH",
+        "startTime": "16:00",
+        "endTime": "16:15"
+      },
+      {
+        "id": "mason-dishwasher-fri",
+        "childId": "mason",
+        "choreId": "empty-dishwasher",
+        "dayOfWeek": "FR",
+        "startTime": "16:00",
+        "endTime": "16:15"
+      },
+      {
+        "id": "reagan-dog-mon",
+        "childId": "reagan",
+        "choreId": "feed-dog",
+        "dayOfWeek": "MO",
+        "startTime": "16:00",
+        "endTime": "16:10"
+      },
+      {
+        "id": "reagan-reset-tue",
+        "childId": "reagan",
+        "choreId": "living-room-reset",
+        "dayOfWeek": "TU",
+        "startTime": "16:00",
+        "endTime": "16:15"
+      },
+      {
+        "id": "reagan-dog-wed",
+        "childId": "reagan",
+        "choreId": "feed-dog",
+        "dayOfWeek": "WE",
+        "startTime": "16:00",
+        "endTime": "16:10"
+      },
+      {
+        "id": "reagan-reset-thu",
+        "childId": "reagan",
+        "choreId": "living-room-reset",
+        "dayOfWeek": "TH",
+        "startTime": "16:00",
+        "endTime": "16:15"
+      },
+      {
+        "id": "reagan-dog-fri",
+        "childId": "reagan",
+        "choreId": "feed-dog",
+        "dayOfWeek": "FR",
+        "startTime": "16:00",
+        "endTime": "16:10"
+      },
+      {
+        "id": "kenzley-table-mon",
+        "childId": "kenzley",
+        "choreId": "set-table",
+        "dayOfWeek": "MO",
+        "startTime": "17:15",
+        "endTime": "17:25"
+      },
+      {
+        "id": "kenzley-toys-tue",
+        "childId": "kenzley",
+        "choreId": "toy-reset",
+        "dayOfWeek": "TU",
+        "startTime": "16:00",
+        "endTime": "16:15"
+      },
+      {
+        "id": "kenzley-table-wed",
+        "childId": "kenzley",
+        "choreId": "set-table",
+        "dayOfWeek": "WE",
+        "startTime": "17:15",
+        "endTime": "17:25"
+      },
+      {
+        "id": "kenzley-toys-thu",
+        "childId": "kenzley",
+        "choreId": "toy-reset",
+        "dayOfWeek": "TH",
+        "startTime": "16:00",
+        "endTime": "16:15"
+      },
+      {
+        "id": "kenzley-table-fri",
+        "childId": "kenzley",
+        "choreId": "set-table",
+        "dayOfWeek": "FR",
+        "startTime": "17:15",
+        "endTime": "17:25"
+      }
+    ],
+    "completions": []
+  },
+  "allowance": {
+    "entries": []
+  }
+}

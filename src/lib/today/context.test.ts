@@ -7,8 +7,8 @@ const plannerData = {
   version: 1,
   timezone: "America/Chicago",
   season: {
-    id: "summer-2026",
-    label: "Summer 2026",
+    id: "summer-break",
+    label: "Summer break",
     startsOn: "2026-06-02",
     endsOn: "2026-09-07",
     schoolReturnsOn: "2026-09-08",

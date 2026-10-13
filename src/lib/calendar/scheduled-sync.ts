@@ -6,7 +6,7 @@ import {
   compactIcsCalendarForImport,
   fetchCalendarText,
   getAllowedCalendarFetchUrl,
-  getCalendarImportStartsOn,
+  getCalendarImportWindow,
   looksLikeIcsCalendar,
 } from "./preview";
 import type { AppliedCalendarEvent, CalendarSourceSchedule } from "./types";
@@ -108,15 +108,15 @@ export async function syncScheduledCalendarSource(
       throw new Error("Calendar response was not a valid ICS calendar.");
     }
 
-    const startsOn = getCalendarImportStartsOn(plannerData.season.startsOn);
+    const { startsOn, endsOn } = getCalendarImportWindow();
     const compactedCalendarText = compactIcsCalendarForImport(calendarText, {
       startsOn,
-      endsOn: plannerData.season.endsOn,
+      endsOn,
     });
     const parsedEvents = parseIcsEvents(compactedCalendarText, {
       sourceId: source.external_key,
       startsOn,
-      endsOn: plannerData.season.endsOn,
+      endsOn,
       timeZone,
     });
     const appliedEvents = parsedEvents.map<AppliedCalendarEvent>((event) => ({

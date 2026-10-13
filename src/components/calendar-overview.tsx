@@ -99,7 +99,7 @@ export function CalendarOverview({ configuredEvents, members, season }: Calendar
   const [selectedMemberId, setSelectedMemberId] = useState("all");
   const [sourceType, setSourceType] = useState<"all" | "configured" | "imported">("all");
   const [selectedTeamKey, setSelectedTeamKey] = useState("all");
-  const [selectedMonth, setSelectedMonth] = useState(season.startsOn.slice(0, 7));
+  const [selectedMonth, setSelectedMonth] = useState(() => getTodayDateKey().slice(0, 7));
   const [hidePastEvents, setHidePastEvents] = useState(true);
   const [manualEventModal, setManualEventModal] = useState(false);
   const [manualEventStatus, setManualEventStatus] = useState<{
